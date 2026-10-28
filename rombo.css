@@ -1,0 +1,212 @@
+/* =========================================================
+   ROMBO 2D y 3D - Hojas de Estilo en Cascada Avanzado
+   Parte 1: transformaciones 2D (rotate, translate, scale, skew)
+   Parte 2: rombo en 3D (octaedro) que gira con perspective
+   ========================================================= */
+
+/* Estilos generales */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* Cada sección ocupa toda la pantalla y centra su contenido */
+.seccion {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 40px 20px;
+}
+
+.seccion p {
+  text-align: center;
+  max-width: 500px;
+  line-height: 1.5;
+  margin-bottom: 40px;
+}
+
+/* =========================================================
+   PARTE 1: EFECTO 2D
+   ========================================================= */
+
+.seccion-2d {
+  background-color: #f0f0f0;
+}
+
+.seccion-2d h1 {
+  color: #333;
+}
+
+/* Contenedor de los rombos */
+.container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 40px;
+}
+
+/* Cada tarjeta tiene el rombo y su nombre debajo */
+.item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.item span {
+  font-weight: bold;
+  color: #333;
+}
+
+/* Estilos del rombo (en vez de la caja cuadrada) */
+.rombo {
+  width: 120px;
+  height: 120px;
+  background-color: #4CAF50;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 22px;
+  cursor: pointer;
+  /* Con clip-path recortamos el cuadrado y queda un rombo */
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  transition: transform 0.5s;
+}
+
+/* Un color distinto para cada rombo */
+.item:nth-child(1) .rombo { background-color: #4CAF50; }
+.item:nth-child(2) .rombo { background-color: #2196F3; }
+.item:nth-child(3) .rombo { background-color: #FF9800; }
+.item:nth-child(4) .rombo { background-color: #E91E63; }
+
+/* Transformaciones en los rombos */
+/* Rotación - Primer rombo */
+.item:nth-child(1) .rombo:hover {
+  transform: rotate(45deg);
+}
+
+/* Traslación - Segundo rombo */
+.item:nth-child(2) .rombo:hover {
+  transform: translateX(50px);
+}
+
+/* Escalado - Tercer rombo */
+.item:nth-child(3) .rombo:hover {
+  transform: scale(1.5);
+}
+
+/* Sesgado - Cuarto rombo */
+.item:nth-child(4) .rombo:hover {
+  transform: skew(10deg, 10deg);
+}
+
+/* =========================================================
+   PARTE 2: EFECTO 3D
+   ========================================================= */
+
+.seccion-3d {
+  background-color: #2c3e50;
+  color: #ecf0f1;
+}
+
+/* Contenedor que le da la profundidad a la escena */
+.contenedor {
+  perspective: 1000px;
+  width: 300px;
+  height: 380px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* El rombo 3D: un punto central desde donde salen todas las caras */
+.rombo3d {
+  position: relative;
+  width: 0;
+  height: 0;
+  transform-style: preserve-3d;
+  transform: rotateX(-20deg) rotateY(-30deg);
+  animation: rotar 6s infinite linear;
+  cursor: pointer;
+}
+
+/* Si paso el mouse por encima, el rombo se detiene */
+.contenedor:hover .rombo3d {
+  animation-play-state: paused;
+}
+
+/* Estilo para cada cara (son triángulos) */
+.cara {
+  position: absolute;
+  width: 200px;
+  height: 173.2px;          /* altura del triángulo equilátero de 200px */
+  left: -100px;
+  border: none;
+  display: flex;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: bold;
+  color: #2c3e50;
+  backface-visibility: visible;
+}
+
+/* Caras de la mitad de arriba (punta hacia arriba) */
+.arriba {
+  top: -173.2px;
+  clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+  transform-origin: 50% 100%;
+  align-items: flex-end;
+  padding-bottom: 30px;
+}
+
+/* Caras de la mitad de abajo (punta hacia abajo) */
+.abajo {
+  top: 0;
+  clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
+  transform-origin: 50% 0%;
+  align-items: flex-start;
+  padding-top: 30px;
+}
+
+/* Colores con transparencia para que se note el volumen */
+.frente   { background-color: rgba(255, 255, 255, 0.85); }
+.derecha  { background-color: rgba(52, 152, 219, 0.85); }
+.atras    { background-color: rgba(26, 188, 156, 0.85); }
+.izquierda{ background-color: rgba(241, 196, 15, 0.85); }
+
+/* Posicionamiento de cada cara
+   - rotateY: elige hacia qué lado mira la cara
+   - translateZ(100px): la saca hasta el borde del rombo
+   - rotateX(35.26deg): la inclina para que todas se junten en la punta */
+.arriba.frente    { transform: rotateY(0deg)   translateZ(100px) rotateX(35.26deg); }
+.arriba.derecha   { transform: rotateY(90deg)  translateZ(100px) rotateX(35.26deg); }
+.arriba.atras     { transform: rotateY(180deg) translateZ(100px) rotateX(35.26deg); }
+.arriba.izquierda { transform: rotateY(-90deg) translateZ(100px) rotateX(35.26deg); }
+
+.abajo.frente     { transform: rotateY(0deg)   translateZ(100px) rotateX(-35.26deg); }
+.abajo.derecha    { transform: rotateY(90deg)  translateZ(100px) rotateX(-35.26deg); }
+.abajo.atras      { transform: rotateY(180deg) translateZ(100px) rotateX(-35.26deg); }
+.abajo.izquierda  { transform: rotateY(-90deg) translateZ(100px) rotateX(-35.26deg); }
+
+/* Animación de rotación */
+@keyframes rotar {
+  from {
+    transform: rotateX(-20deg) rotateY(-30deg);
+  }
+  to {
+    transform: rotateX(-20deg) rotateY(330deg);
+  }
+}
